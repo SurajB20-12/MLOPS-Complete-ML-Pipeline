@@ -7,6 +7,9 @@ import numpy as np
 import pickle
 from config.logger import get_logger
 from sklearn.ensemble import RandomForestClassifier
+from config.params import ParamsManager
+
+params_manager = ParamsManager()
 
 logger = get_logger("model_training")
 
@@ -74,13 +77,15 @@ def save_model(model, file_path: str) -> None:
 
 def main():
     try:
-        params = {"n_estimators": 25, "random_state": 2}
+        n_estimators = params_manager.get("model_training", "n_estimators")
+        random_state = params_manager.get("model_training", "random_state")
+        model_params = {"n_estimators": n_estimators, "random_state": random_state}
 
         train_data = load_data("./data/processed/train_tfidf.csv")
         X_train = train_data.iloc[:, :-1].values
         y_train = train_data.iloc[:, -1].values
 
-        clf = train_model(X_train, y_train, params)
+        clf = train_model(X_train, y_train, model_params)
         model_save_path = "models/model.pkl"
         save_model(clf, model_save_path)
     except Exception as e:

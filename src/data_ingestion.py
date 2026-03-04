@@ -6,7 +6,9 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from config.logger import get_logger
+from config.params import ParamsManager
 
+params = ParamsManager()
 
 logger = get_logger("data_ingestion")
 
@@ -55,7 +57,7 @@ def save_data(
 # main function to execute the data ingestion process
 def main():
     try:
-        test_size = 0.2
+        test_size = params.get("data_ingestion", "test_size")
         data_path = (
             "https://raw.githubusercontent.com/vikashishere/Datasets/main/spam.csv"
         )

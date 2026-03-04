@@ -5,6 +5,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from config.logger import get_logger
+from config.params import ParamsManager
+
+params = ParamsManager()
 
 logger = get_logger("feature_engineering")
 
@@ -67,7 +70,7 @@ def save_data(df: pd.DataFrame, file_path: str) -> None:
 
 def main():
     try:
-        max_features = 50
+        max_features = params.get("feature_engineering", "max_features")
 
         train_data = load_data("./data/interim/train_processed.csv")
         test_data = load_data("./data/interim/test_processed.csv")
