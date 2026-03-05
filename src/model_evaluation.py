@@ -7,6 +7,7 @@ import numpy as np
 import pickle
 import json
 from config.logger import get_logger
+from config.params import ParamsManager
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -14,6 +15,9 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
 )
+from dvclive import Live
+
+params = ParamsManager()
 
 logger = get_logger("model_evaluation")
 
@@ -93,6 +97,18 @@ def main():
         y_test = test_data.iloc[:, -1].values
 
         metrics = evaluate_model(clf, X_test, y_test)
+        n_estimators = params.get("model_training", "n_estimators")
+        random_state = params.get("model_training", "random_state")
+        with Live(save_dvc_exp=True) as live:
+            live.log_params(
+                {"n_estimators": n_estimators, "random_state": random_state}
+            )
+            live.log_metric("accuracy", metrics["accuracy"])
+            live.log_metric("precision", metrics["precision"])
+            live.log_metric("recall", metrics["recall"])
+            live.log_metric("f1_score", metrics["f1_score"])
+            live.log_metric("roc_auc", metrics["roc_auc"])
+
         save_metrics(metrics, "reports/metrics.json")
     except Exception as e:
         logger.error("Error in model evaluation pipeline: %s", e)
